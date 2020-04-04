@@ -4,7 +4,7 @@
 <p>translators</p>
 </h1>
 <h3 align="center">
-<p>Translators: Collection of Machine Translation models for PyTorch</p>
+<p>Translators: Tổng hợp các mô hình dịch máy cho PyTorch</p>
 </h3>
 
 **Coming soon ...**
