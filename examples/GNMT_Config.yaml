@@ -4,7 +4,6 @@ corpus: null
 # Embeder parameters
 pretrain_vectors: null
 embedd_size: 300
-PAD_idx: 1
 
 # Encoder-Decoder parameters
 num_enc_layers: 8
