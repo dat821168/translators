@@ -4,7 +4,7 @@ corpus: null
 # Embeder parameters
 pretrain_vectors: null
 embedd_size: 300
-
+vocab_size: 10
 # Encoder-Decoder parameters
 num_enc_layers: 8
 num_dec_layers: 8

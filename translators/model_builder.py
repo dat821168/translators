@@ -1,6 +1,6 @@
 from translators.configuration import Config
 from translators.models import NMTModel, GNMT
-from translators.cores.modules.inputters import tokenizer
+from translators.cores.modules.inputters import tokenizer, BPETokenizer
 
 
 def build_model(config: Config) -> NMTModel:
@@ -12,7 +12,7 @@ def build_model(config: Config) -> NMTModel:
 
 
 def build_tokenizer(config: Config) -> tokenizer:
-    raise NotImplementedError
+    t = BPETokenizer()
 
 
 def build_examples(config: Config):

@@ -13,7 +13,7 @@ import torch.nn as nn
 class Embedder(nn.Module):
     def __init__(self, config):
         super(Embedder, self).__init__()
-        self.emb_lut = nn.Embedding(config.vocab_size, config.embedd_size, padding_idx=config.PAD_idx)
+        self.emb_lut = nn.Embedding(config.vocab_size, config.embedd_size, padding_idx=config.PAD_IDX)
         if config.pretrain_vectors:
             self.load_pretrained_vectors(config.pretrain_vectors)
         else:

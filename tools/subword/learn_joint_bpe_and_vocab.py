@@ -28,8 +28,7 @@ if __name__ == '__main__':
     import learn_bpe
     import apply_bpe
 else:
-    from . import learn_bpe
-    from . import apply_bpe
+    from tools.subword import apply_bpe, learn_bpe
 
 # hack for python2/3 compatibility
 from io import open
@@ -48,7 +47,7 @@ def create_parser(subparsers=None):
             description="learn BPE-based word segmentation")
 
     parser.add_argument(
-        '--input', '-i', type=argparse.FileType('r'), required=True, nargs = '+',
+        '--input', '-i', type=argparse.FileType('r'), required=True, nargs='+',
         metavar='PATH',
         help="Input texts (multiple allowed).")
     parser.add_argument(
