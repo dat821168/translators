@@ -1,12 +1,14 @@
 import os
-import json
+
+from collections import Counter, OrderedDict
+from torchtext.vocab import Vocab
 
 
-class Tokenzier(object):
+class Tokenizer(object):
     def __init__(self, vocab_file: str = None, separator: str = '@@',
                  pad_token: str = '<pad>', unk_token: str = '<unk>',
                  sos_token: str = '<sos>', eos_token: str = '<eos>'):
-        assert vocab_file is not None and os.path.exists(vocab_file), f"Error: Vocab file not exits!!!"
+        assert vocab_file is not None and os.path.exists(vocab_file), f"Error: Vocab file {vocab_file} not exits!!!"
         # Special tokens:
         self.separator = separator
         self.pad_token = pad_token
@@ -14,60 +16,31 @@ class Tokenzier(object):
         self.sos_token = sos_token
         self.eos_token = eos_token
 
-        self.t2i = {}
-        self.i2t = []
-
         if vocab_file:
-            self.__build_vocab(vocab_file)
+            self.vocab: Vocab = self.__build_vocab(vocab_file)
 
     def __len__(self):
-        return len(self.i2t)
+        return len(self.vocab)
 
-    def __add_token(self, token):
-        token = token.strip()
-        if token not in self.i2t:
-            self.i2t.append(token)
-            self.t2i[token] = len(self.i2t)
-
-    def __build_vocab(self, vocab_file: str):
-        if self.pad_token:
-            self.__add_token(self.pad_token)
-        if self.unk_token:
-            self.__add_token(self.unk_token)
-        if self.bos_token:
-            self.__add_token(self.sos_token)
-        if self.eos_token:
-            self.__add_token(self.eos_token)
-
+    def __build_vocab(self, vocab_file: str) -> Vocab:
+        specials = list(OrderedDict.fromkeys(tok for tok in [self.unk_token, self.pad_token,
+                                                                  self.sos_token, self.eos_token]))
+        counter = Counter()
         with open(vocab_file, "r", encoding="utf-8") as f:
             while True:
                 token = f.readline()
-                if token:
+                if not token:
                     break
-                self.__add_token(token)
+                counter.update([token.strip()])
             f.close()
-
-    def load_from_json(self, json_file: str):
-        assert os.path.exists(json_file), f"Error: Vocab file not exits!!!"
-        with open(json_file, 'r', encoding="utf-8") as f:
-            attrs = json.load(f)
-            self.separator = attrs["separator"]
-            self.i2t = attrs["i2t"]
-            self.t2i = attrs["t2i"]
-            self.pad_token = attrs["pad_token"]
-            self.unk_token = attrs["unk_token"]
-            self.sos_token = attrs["sos_token"]
-            self.eos_token = attrs["eos_token"]
-            f.close()
+        return Vocab(counter=counter, specials=specials)
 
     def tokenize(self, sent: str) -> list:
         tokens = sent.strip().split()
-        idxs = [self.t2i[t] if t in self.i2t else self.t2i[self.unk_token]for t in tokens]
-        idxs = [self.sos_token] + idxs + [self.eos_token]
-        return idxs
+        return tokens
 
     def detokenize(self, idxs: list, delim: str = ' ') -> str:
-        detok = delim.join([self.i2t[idx] for idx in idxs])
+        detok = delim.join([self.vocab.itos[idx] for idx in idxs])
         detok = detok.replace(self.separator + ' ', '')
         detok = detok.replace(self.separator, '')
 

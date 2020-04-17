@@ -1,10 +1,19 @@
 # DataLoader parameters
-corpus: null
+train_src_file: "datasets/bpe_data/dev.BPE.10000.en"
+train_tgt_file: "datasets/bpe_data/dev.BPE.10000.vi"
+
+dev_src_file: "datasets/bpe_data/dev.BPE.10000.en"
+dev_tgt_file: "datasets/bpe_data/dev.BPE.10000.vi"
+
+test_src_file: "datasets/bpe_data/test.BPE.10000.en"
+test_tgt_file: "datasets/bpe_data/test.BPE.10000.vi"
+
+vocab_file: "datasets/bpe_data/vocab.bpe.10000"
 
 # Embeder parameters
 pretrain_vectors: null
 embedd_size: 300
-vocab_size: 10
+
 # Encoder-Decoder parameters
 num_enc_layers: 8
 num_dec_layers: 8
@@ -13,3 +22,7 @@ dropout: 0.2
 init_weight: 0.1
 
 # Trainer parameters
+device: 'cuda'
+batch_size: 8
+epochs: 10
+learning_rate: 0.001

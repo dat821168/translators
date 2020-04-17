@@ -129,7 +129,7 @@ class RRDecoder(DecoderBase):
         x, h = self.decoder_layers[0](x, hidden[1])
         self.append_hidden(h)
 
-        for i in range(1, len(self.rnn_layers)):
+        for i in range(1, len(self.decoder_layers)):
             residual = x
             x = torch.cat((x, attn), dim=2)
             x = self.dropout(x)

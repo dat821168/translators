@@ -39,7 +39,7 @@ class RREncoder(EncoderBase):
         self.dropout = nn.Dropout(p=config.dropout)
 
     def forward(self, src: torch.LongTensor, lengths=None) -> torch.FloatTensor:
-        self._check_args(src, lengths)
+        #self._check_args(src, lengths)
 
         emb = self.embedder(src)
 
@@ -51,7 +51,7 @@ class RREncoder(EncoderBase):
 
         # 2nd encoder layer (uni-directional layers)
         memory_bank = self.dropout(memory_bank)
-        memory_bank, _ = self.rnn_layers[1](memory_bank)
+        memory_bank, _ = self.encoder_layers[1](memory_bank)
 
         # others encoder layer (uni-directional layers and residual connections),
         for enc_layer in self.encoder_layers[2:]:
