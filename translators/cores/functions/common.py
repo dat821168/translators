@@ -1,4 +1,47 @@
+import os
+import json
 import torch.nn.init as init
+import matplotlib.pyplot as plt
+
+from translators.logger import logger
+
+
+def plot_figure(save_dir: str, historys: dict):
+    # plot LOSS history
+    plt.plot(historys['AVG_TRAIN_LOSSES'], label='TRAIN')
+    plt.plot(historys['AVG_EVAL_LOSSES'], label='EVAL')
+    plt.xlabel('EPOCH')
+    plt.ylabel('LOSS')
+    plt.title('Model Loss')
+    plt.legend()
+    plt.savefig(os.path.join(save_dir, 'training_loss.png'))
+    logger.info(f'Training loss diagrams was saved in {os.path.join(save_dir, "training_loss.png")} !!!')
+
+    # plot ACC history
+    plt.plot(historys['TRAIN_ACCS'], label='TRAIN')
+    plt.plot(historys['EVAL_ACCS'], label='EVAL')
+    plt.xlabel('EPOCH')
+    plt.ylabel('ACC')
+    plt.title('Model ACC')
+    plt.legend()
+    plt.savefig(os.path.join(save_dir, 'training_acc.png'))
+    logger.info(f'Training acc diagrams was saved in {os.path.join(save_dir, "training_acc.png")} !!!')
+
+    # plot PPL history
+    plt.plot(historys['TRAIN_PPLS'], label='TRAIN')
+    plt.plot(historys['EVAL_PPLS'], label='EVAL')
+    plt.xlabel('EPOCH')
+    plt.ylabel('PPL')
+    plt.title('Model Perplexity')
+    plt.legend()
+    plt.savefig(os.path.join(save_dir, 'training_perplexity.png'))
+    logger.info(f'Training ppl diagrams was saved in {os.path.join(save_dir, "training_perplexity.png")} !!!')
+
+
+def save_train_history(save_dir: str, historys: dict):
+    with open(os.path.join(save_dir, 'training_history.png'), "w", encoding="utf-8") as out:
+        json.dump(historys, out)
+    logger.info(f'Training history was saved in {os.path.join(save_dir, "training_history.png")} !!!')
 
 
 def init_lstm_(lstm, init_weight=0.1):

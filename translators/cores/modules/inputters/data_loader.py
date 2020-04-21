@@ -1,20 +1,26 @@
 import os
 import torch
 
-from torchtext.data import Field, Example, Iterator, Dataset
+from torchtext.data import Field, RawField, Example, Iterator, Dataset
 from translators.cores.modules.inputters import Tokenizer
 
 
-def get_field(tokenizer: Tokenizer) -> (Field, Field):
-    src_field = Field(tokenize=tokenizer.tokenize, init_token=tokenizer.sos_token, eos_token=tokenizer.eos_token,
-                      pad_token=tokenizer.unk_token, unk_token=tokenizer.unk_token, lower=True, batch_first=True,
-                      include_lengths=True)
-    tgt_field = Field(tokenize=tokenizer.tokenize, init_token=tokenizer.sos_token, eos_token=tokenizer.eos_token,
-                      pad_token=tokenizer.unk_token, unk_token=tokenizer.unk_token, lower=True, batch_first=True,
-                      include_lengths=True)
-    src_field.vocab = tokenizer.vocab
-    tgt_field.vocab = tokenizer.vocab
-    return src_field, tgt_field
+def get_field(tokenizer: Tokenizer, fields: tuple = None, use_test: bool = False) -> (Field, Field, RawField):
+    raw_field = None
+    if fields:
+        src_field, tgt_field = fields
+    else:
+        src_field = Field(tokenize=tokenizer.tokenize, init_token=tokenizer.sos_token, eos_token=tokenizer.eos_token,
+                          pad_token=tokenizer.pad_token, unk_token=tokenizer.unk_token, lower=True, batch_first=True,
+                          include_lengths=True)
+        tgt_field = Field(tokenize=tokenizer.tokenize, init_token=tokenizer.sos_token, eos_token=tokenizer.eos_token,
+                          pad_token=tokenizer.pad_token, unk_token=tokenizer.unk_token, lower=True, batch_first=True,
+                          include_lengths=True)
+        src_field.vocab = tokenizer.vocab
+        tgt_field.vocab = tokenizer.vocab
+    if use_test:
+        raw_field = RawField(preprocessing=None, postprocessing=None, is_target=True)
+    return src_field, tgt_field, raw_field
 
 
 class NMTDataset(object):
@@ -68,7 +74,7 @@ class NMTDataset(object):
             shuffle=True,
             sort=False,
             sort_within_batch=True,
-            sort_key=lambda x: len(x.src)
+            sort_key=lambda x: len(x.src),
         )
         return cur_iter
 

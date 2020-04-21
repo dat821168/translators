@@ -7,7 +7,7 @@ class SequenceGenerator:
     """
     def __init__(self, model, beam_size=5, max_seq_len=100, cuda=False,
                  len_norm_factor=0.6, len_norm_const=5,
-                 cov_penalty_factor=0.1, sos_token: str = '<sos>', eos_token: str = '<eos>'):
+                 cov_penalty_factor=0.1, sos_idx: int = 2, eos_idx: int = 3):
         """
         Constructor for the SequenceGenerator.
 
@@ -32,10 +32,8 @@ class SequenceGenerator:
         self.len_norm_const = len_norm_const
         self.cov_penalty_factor = cov_penalty_factor
 
-        self.batch_first = self.model.batch_first
-
-        self.sos_token = sos_token
-        self.eos_token = eos_token
+        self.sos_idx = sos_idx
+        self.eos_idx = eos_idx
 
     def greedy_search(self, batch_size, initial_input, initial_context=None):
         """
@@ -64,15 +62,10 @@ class SequenceGenerator:
             active = active.cuda()
             base_mask = base_mask.cuda()
 
-        translation[:, 0] = self.sos_token
+        translation[:, 0] = self.sos_idx
         words, context = initial_input, initial_context
-
-        if self.batch_first:
-            word_view = (-1, 1)
-            ctx_batch_dim = 0
-        else:
-            word_view = (1, -1)
-            ctx_batch_dim = 1
+        word_view = (-1, 1)
+        ctx_batch_dim = 0
 
         counter = 0
         for idx in range(1, max_seq_len):
@@ -88,7 +81,7 @@ class SequenceGenerator:
             translation[active, idx] = words
             lengths[active] += 1
 
-            terminating = (words == self.eos_token)
+            terminating = (words == self.eos_idx)
 
             if terminating.any():
                 not_terminating = ~terminating
@@ -124,15 +117,14 @@ class SequenceGenerator:
         max_seq_len = self.max_seq_len
         cov_penalty_factor = self.cov_penalty_factor
 
-        translation = torch.zeros(batch_size * beam_size, max_seq_len,
-                                  dtype=torch.int64)
+        translation = torch.zeros(batch_size * beam_size, max_seq_len, dtype=torch.int64)
+
         lengths = torch.ones(batch_size * beam_size, dtype=torch.int64)
         scores = torch.zeros(batch_size * beam_size, dtype=torch.float32)
 
         active = torch.arange(0, batch_size * beam_size, dtype=torch.int64)
         base_mask = torch.arange(0, batch_size * beam_size, dtype=torch.int64)
-        global_offset = torch.arange(0, batch_size * beam_size, beam_size,
-                                     dtype=torch.int64)
+        global_offset = torch.arange(0, batch_size * beam_size, beam_size, dtype=torch.int64)
 
         eos_beam_fill = torch.tensor([0] + (beam_size - 1) * [float('-inf')])
 
@@ -145,36 +137,21 @@ class SequenceGenerator:
             global_offset = global_offset.cuda()
             eos_beam_fill = eos_beam_fill.cuda()
 
-        translation[:, 0] = self.sos_token
+        translation[:, 0] = self.sos_idx
 
         words, context = initial_input, initial_context
 
-        if self.batch_first:
-            word_view = (-1, 1)
-            ctx_batch_dim = 0
-            attn_query_dim = 1
-        else:
-            word_view = (1, -1)
-            ctx_batch_dim = 1
-            attn_query_dim = 0
+        word_view = (-1, 1)
+        ctx_batch_dim = 0
+        attn_query_dim = 1
 
-        # replicate context
-        if self.batch_first:
-            # context[0] (encoder state): (batch, seq, feature)
-            _, seq, feature = context[0].shape
-            context[0].unsqueeze_(1)
-            context[0] = context[0].expand(-1, beam_size, -1, -1)
-            context[0] = context[0].contiguous().view(batch_size * beam_size,
-                                                      seq, feature)
-            # context[0]: (batch * beam, seq, feature)
-        else:
-            # context[0] (encoder state): (seq, batch, feature)
-            seq, _, feature = context[0].shape
-            context[0].unsqueeze_(2)
-            context[0] = context[0].expand(-1, -1, beam_size, -1)
-            context[0] = context[0].contiguous().view(seq, batch_size *
-                                                      beam_size, feature)
-            # context[0]: (seq, batch * beam,  feature)
+        # context[0] (encoder state): (batch, seq, feature)
+        _, seq, feature = context[0].shape
+        context[0].unsqueeze_(1)
+        context[0] = context[0].expand(-1, beam_size, -1, -1)
+        context[0] = context[0].contiguous().view(batch_size * beam_size,
+                                                  seq, feature)
+        # context[0]: (batch * beam, seq, feature)
 
         # context[1] (encoder seq length): (batch)
         context[1].unsqueeze_(1)
@@ -192,7 +169,7 @@ class SequenceGenerator:
                 break
             counter += 1
 
-            eos_mask = (words == self.eos_token)
+            eos_mask = (words == self.eos_idx)
             eos_mask = eos_mask.view(-1, beam_size)
 
             terminating, _ = eos_mask.min(dim=1)
@@ -208,7 +185,7 @@ class SequenceGenerator:
 
             # words: (batch, beam, k)
             words = words.view(-1, beam_size, beam_size)
-            words = words.masked_fill(eos_mask.unsqueeze(2), self.eos_token)
+            words = words.masked_fill(eos_mask.unsqueeze(2), self.eos_idx)
 
             # logprobs: (batch, beam, k)
             logprobs = logprobs.float().view(-1, beam_size, beam_size)

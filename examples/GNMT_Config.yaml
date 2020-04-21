@@ -23,6 +23,7 @@ init_weight: 0.1
 
 # Trainer parameters
 device: 'cuda'
-batch_size: 8
-epochs: 10
-learning_rate: 0.001
+batch_size: 16
+epochs: 1000
+learning_rate: 0.002
+early_stop: 20 # Set value = '0' when not use early stopping and value > 0 when stop training with this value epoch loss not decrease

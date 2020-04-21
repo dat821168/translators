@@ -1,6 +1,7 @@
 import yaml
 
 import torch
+
 MODEL_TYPES = ['GNMT']
 
 
@@ -13,6 +14,8 @@ class Config(object):
 
         # Paths
         self.config: str = config_path
+        self.chkpt_file = None
+
         self.train_src_file = None
         self.train_tgt_file = None
 
@@ -23,8 +26,7 @@ class Config(object):
         self.test_tgt_file = None
 
         self.vocab_file: str = None
-        self.save_dir: str = 'outputs'
-
+        self.save_dir: str = "outputs/"
 
         # Embedder
         self.vocab_size: int = None
@@ -40,10 +42,13 @@ class Config(object):
 
         self.PAD_IDX, self.UNK_IDX, self.SOS_IDX, self.EOS_IDX = [0, 1, 2, 3]
 
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.early_stop = 0
 
         # Read config file
         self.build_from_file()
+
+        if not self.device:
+            self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     def build_from_file(self):
         with open(self.config, 'r', encoding='utf-8') as f:

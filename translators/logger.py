@@ -13,7 +13,7 @@ def init_logger(log_file=None, log_file_level=logging.NOTSET):
     if isinstance(log_file, Path):
         log_file = str(log_file)
 
-    log_format = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
+    log_format = logging.Formatter(fmt='%(message)s',
                                    datefmt='%m/%d/%Y %H:%M:%S')
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
