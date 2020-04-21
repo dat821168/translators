@@ -37,13 +37,13 @@ if __name__ == "__main__":
 
     best_eval_loss = float('inf')
     bad_loss_count = 0
-    blue_score = translator.translate(test_iter, tokenizer)
-    # try:
-    #     blue_score = translator.translate(test_iter, tokenizer)
-    # except KeyboardInterrupt as e:
-    #      print(e)
-    # except Exception as e:
-    #      print(e)
+
+    try:
+        blue_score = translator.translate(test_iter, tokenizer)
+    except KeyboardInterrupt as e:
+         print(e)
+    except Exception as e:
+         print(e)
 
 
 

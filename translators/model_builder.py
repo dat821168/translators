@@ -44,6 +44,17 @@ def build_generator(model, beam_size: int, max_seq_len: int, cuda: bool, len_nor
     generator = SequenceGenerator(model=model, beam_size=beam_size, max_seq_len=max_seq_len, cuda=cuda,
                                   len_norm_factor=len_norm_factor, len_norm_const=len_norm_const,
                                   cov_penalty_factor=cov_penalty_factor, sos_idx=sos_idx, eos_idx=eos_idx)
+    logger.info(f'{"#" * 15}Generator Summary{"#" * 15}')
+    logger.info(f'Geerator Type: Beam search')
+    logger.info(f'Beam size: {beam_size}')
+    logger.info(f'Max predict length: {max_seq_len}')
+    logger.info(f'Start of sentence index: {sos_idx}')
+    logger.info(f'End of sentence index: {eos_idx}')
+    logger.info(f'Length normalization factor: {len_norm_factor}')
+    logger.info(f'Length normalization constant: {len_norm_const}')
+    logger.info(f'Coverage penalty factor: {cov_penalty_factor}')
+    logger.info(f'Use cuda: {cuda}')
+    logger.info(f'{"=" * 40}')
     logger.info('\n')
     return generator
 

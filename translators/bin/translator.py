@@ -3,6 +3,7 @@ import torch
 import sacrebleu
 
 from translators.model_builder import build_generator
+from translators.logger import logger
 from tqdm import tqdm
 
 
@@ -20,13 +21,14 @@ class Translator(object):
                                          sos_idx=self.sos_idx, eos_idx=self.eos_idx)
 
     def translate(self, data_iter, tokenizer):
+        logger.info("Start translate ...")
         self.model.eval()
         predicts, golds, srcs = self.evaluate(data_iter, tokenizer)
         # score = self.metric.corpus_bleu(golds, predicts, [1,0])
         # self.write_predicts(predicts, golds, srcs)
-        score = sacrebleu.corpus_bleu(predicts, [golds], tokenize='13a', force=True)
-        print(score.score)
-        return score
+        bleu = sacrebleu.corpus_bleu(predicts, [golds], tokenize='13a', force=True)
+        logger.info(f"The model achieved {bleu.score} BLEU score on the TEST set.")
+        return bleu.score
 
     def evaluate(self, data_iter, tokenizer):
         """
