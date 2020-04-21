@@ -16,7 +16,7 @@ def plot_figure(save_dir: str, historys: dict):
     plt.legend()
     plt.savefig(os.path.join(save_dir, 'training_loss.png'))
     logger.info(f'Training loss diagrams was saved in {os.path.join(save_dir, "training_loss.png")} !!!')
-
+    plt.show()
     # plot ACC history
     plt.plot(historys['TRAIN_ACCS'], label='TRAIN')
     plt.plot(historys['EVAL_ACCS'], label='EVAL')
@@ -26,7 +26,7 @@ def plot_figure(save_dir: str, historys: dict):
     plt.legend()
     plt.savefig(os.path.join(save_dir, 'training_acc.png'))
     logger.info(f'Training acc diagrams was saved in {os.path.join(save_dir, "training_acc.png")} !!!')
-
+    plt.show()
     # plot PPL history
     plt.plot(historys['TRAIN_PPLS'], label='TRAIN')
     plt.plot(historys['EVAL_PPLS'], label='EVAL')
@@ -36,7 +36,7 @@ def plot_figure(save_dir: str, historys: dict):
     plt.legend()
     plt.savefig(os.path.join(save_dir, 'training_perplexity.png'))
     logger.info(f'Training ppl diagrams was saved in {os.path.join(save_dir, "training_perplexity.png")} !!!')
-
+    plt.show()
 
 def save_train_history(save_dir: str, historys: dict):
     with open(os.path.join(save_dir, 'training_history.png'), "w", encoding="utf-8") as out:

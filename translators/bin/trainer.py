@@ -66,7 +66,7 @@ class Statistics(object):
         """
         Caculate the cost time.
         """
-        return time.time() - self.start_time
+        return round((time.time() - self.start_time) / 60, 4)
 
 
 class NMTTrainer(object):
@@ -121,8 +121,9 @@ class NMTTrainer(object):
         assert mode in ['TRAIN', 'EVAL'], \
             f'ERROR | print_stats(): Mode must in ["TRAIN", "EVAL"] !!!'
 
-        logger.info(f'\t{mode}\t| AVG LOSS: {stats.avg_loss()} |\tACC: {stats.accuracy()} |\t Perplexity: {stats.ppl()}'
-                    f' |\tEPOCH TIME: {stats.elapsed_time()} |\tlr: {self.optimizer.param_groups[0]["lr"]}')
+        logger.info(f'\t{mode}\t| AVG LOSS: {stats.avg_loss()} |\tACC: {stats.accuracy():.4f}% |'
+                    f'\t Perplexity: {stats.ppl():.4f} |\tEPOCH TIME: {stats.elapsed_time()} minutes|'
+                    f'\tlr: {self.optimizer.param_groups[0]["lr"]}')
 
     def optimize(self, train_iter):
         torch.set_grad_enabled(True)

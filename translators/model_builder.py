@@ -26,9 +26,9 @@ def build_model(config: Config) -> NMTModel:
     model = model.to(config.device)
 
     parameters = [count_parameters(model, True), count_parameters(model, False)]
-    logger.info(f'{"#"*15}Model Summary{"#"*15}')
     logger.info(f'{model}')
-    logger.info(f'{"="*40}')
+    logger.info('\n')
+    logger.info(f'{"#" * 15}Model Summary{"#" * 15}')
     logger.info(f'Total parameters: {sum(parameters):,}')
     logger.info(f'Trainable parameters: {parameters[0]:,}')
     logger.info(f'Non-trainable parameters: {parameters[1]:,}')
@@ -44,6 +44,7 @@ def build_generator(model, beam_size: int, max_seq_len: int, cuda: bool, len_nor
     generator = SequenceGenerator(model=model, beam_size=beam_size, max_seq_len=max_seq_len, cuda=cuda,
                                   len_norm_factor=len_norm_factor, len_norm_const=len_norm_const,
                                   cov_penalty_factor=cov_penalty_factor, sos_idx=sos_idx, eos_idx=eos_idx)
+    logger.info('\n')
     logger.info(f'{"#" * 15}Generator Summary{"#" * 15}')
     logger.info(f'Geerator Type: Beam search')
     logger.info(f'Beam size: {beam_size}')
@@ -80,13 +81,17 @@ def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None):
     logger.info("Building Corpus ...")
     if config.train_src_file:
         logger.info(f"\tReading train dataset ...")
+        logger.info(f"\t\tSource file: {config.train_src_file}")
+        logger.info(f"\t\tTarget file: {config.train_tgt_file}")
         fields = (src_field, tgt_field)
         dataset['train'] = NMTDataset(src_file=config.train_src_file, tgt_file=config.train_tgt_file, fields=fields,
                                       min_len=config.min_len, max_len=config.max_len,
                                       device=config.device, is_train=True,
                                       batch_size=config.batch_size)
     if config.dev_src_file:
-        logger.info(f"\tReading eval dataset ...")
+        logger.info(f"\tReading dev dataset ...")
+        logger.info(f"\t\tSource file: {config.dev_src_file}")
+        logger.info(f"\t\tTarget file: {config.dev_tgt_file}")
         fields = (src_field, tgt_field)
         dataset['eval'] = NMTDataset(src_file=config.dev_src_file, tgt_file=config.dev_tgt_file, fields=fields,
                                      min_len=config.min_len, max_len=config.max_len,
@@ -94,12 +99,14 @@ def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None):
                                      batch_size=config.batch_size)
     if config.test_src_file:
         logger.info(f"\tReading test dataset ...")
+        logger.info(f"\t\tSource file: {config.test_src_file}")
+        logger.info(f"\t\tTarget file: {config.test_tgt_file}")
         fields = (src_field, raw_field)
         dataset['test'] = NMTDataset(src_file=config.test_src_file, tgt_file=config.test_tgt_file, fields=fields,
                                      min_len=config.min_len, max_len=config.max_len,
                                      device=config.device, is_train=False,
                                      batch_size=config.batch_size)
-
+    logger.info('\n')
     logger.info(f'{"#"*15}Corpus Summary{"#"*15}')
     logger.info(f'Batch size: {config.batch_size}')
     logger.info(f'Min length: {config.min_len}')

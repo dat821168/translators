@@ -1,4 +1,5 @@
 import os
+import time
 import torch.optim as optim
 
 from translators import Config
@@ -27,6 +28,7 @@ if __name__ == "__main__":
     best_training_step = 0
     bad_loss_count = 0
     total_epoch = 0
+    total_time = time.time()
     try:
         for epoch in range(cnf.epochs):
             total_epoch += 1
@@ -47,17 +49,28 @@ if __name__ == "__main__":
                 logger.info("Early stopping !!!")
                 break
     except KeyboardInterrupt:
-        logger.info(f"Performed {total_epoch} iterations and {trainer.training_step:,} steps")
+        total_time = round((time.time() - total_time)/60, 4)
+        logger.info(f'{"=" * 40}')
+        logger.info('\n')
+        logger.info(f"Performed {total_epoch} iterations and {trainer.training_step:,} steps in a total of {total_time} minutes")
         logger.info(f"Achieve the best model at the {best_epoch}st iteration and and the {best_training_step:,}th step")
         logger.info(f"The lowest EVAL Loss is {best_eval_loss}.")
-        plot_figure(cnf.save_dir, trainer.historys)
         save_train_history(cnf.save_dir, trainer.historys)
+        logger.info(f'{"=" * 40}')
+        logger.info('\n')
+        plot_figure(cnf.save_dir, trainer.historys)
     except Exception as e:
         print(e)
-    logger.info(f"Performed {total_epoch} iterations and {trainer.training_step:,} steps")
+
+    total_time = round((time.time() - total_time)/60, 4)
+    logger.info(f'{"=" * 40}')
+    logger.info('\n')
+    logger.info(f"Performed {total_epoch} iterations and {trainer.training_step:,} steps in a total of {total_time} minutes")
     logger.info(f"Achieve the best model at the {best_epoch}st iteration and and the {best_training_step:,}th step")
     logger.info(f"The lowest EVAL Loss is {best_eval_loss}.")
-    plot_figure(cnf.save_dir, trainer.historys)
     save_train_history(cnf.save_dir, trainer.historys)
+    logger.info(f'{"=" * 40}')
+    logger.info('\n')
+    plot_figure(cnf.save_dir, trainer.historys)
 
 
