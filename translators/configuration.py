@@ -27,7 +27,7 @@ class Config(object):
 
         self.vocab_file: str = None
         self.save_dir: str = "outputs/"
-
+        self.dataset_file = None
         # Embedder
         self.vocab_size: int = None
 

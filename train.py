@@ -15,7 +15,7 @@ if __name__ == "__main__":
     init_logger(log_file=os.path.join(cnf.save_dir, "train_nmt_model.log"), log_file_level='INFO')
     tokenizer = build_tokenizer(cnf)
     nmtmodel = build_model(cnf)
-    dataset, fields = build_dataset(cnf, tokenizer)
+    dataset, fields = build_dataset(cnf, tokenizer, dataset_file=cnf.dataset_file)
     criterion = build_criterion(cnf.vocab_size, tokenizer.vocab.stoi[tokenizer.pad_token], cnf.device)
     optimizer = optim.Adam(nmtmodel.parameters(), lr=cnf.learning_rate)
     trainer = NMTTrainer(config=cnf, model=nmtmodel, criterion=criterion, optimizer=optimizer, pad_idx=fields[0].vocab.stoi[fields[0].pad_token])
@@ -29,6 +29,7 @@ if __name__ == "__main__":
     bad_loss_count = 0
     total_epoch = 0
     total_time = time.time()
+    train_stats = trainer.optimize(train_iter)
     try:
         for epoch in range(cnf.epochs):
             total_epoch += 1

@@ -9,7 +9,8 @@ test_src_file: "datasets/bpe_data/test.BPE.10000.en"
 test_tgt_file: "datasets/bpe_data/test.BPE.10000.vi"
 
 vocab_file: "datasets/bpe_data/vocab.bpe.10000"
-
+#dataset_file: "outputs/nmt_dataset.cache"
+dataset_file: null
 # Embeder parameters
 pretrain_vectors: null
 embedd_size: 300

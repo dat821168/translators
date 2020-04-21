@@ -98,6 +98,7 @@ class NMTTrainer(object):
         logger.info('\n')
 
     def feed_data(self, data_iter, stats, is_train: bool = True):
+        data_iter.init_epoch()
         tqdm_bar = tqdm(enumerate(data_iter), total=len(data_iter), desc='TRAIN' if is_train else 'EVAL')
         for i, batch in tqdm_bar:
             self.training_step += 1

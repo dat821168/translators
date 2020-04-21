@@ -1,6 +1,6 @@
 # DataLoader parameters
-test_src_file: "datasets/bpe_data/dev.BPE.10000.en"
-test_tgt_file: "datasets/raw_data/dev.vi"
+test_src_file: "datasets/bpe_data/test.BPE.10000.en"
+test_tgt_file: "datasets/raw_data/test.vi"
 
 chkpt_file: "outputs/nmt_model_chkpt.pt"
 

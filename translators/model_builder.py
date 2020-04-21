@@ -6,6 +6,7 @@ from translators.configuration import Config
 from translators.models import NMTModel, GNMT, count_parameters
 from translators.cores.modules.inputters import Tokenizer, NMTDataset, get_field
 from translators.cores.modules.generator import SequenceGenerator
+from translators.cores.functions import save_dataset, load_dataset
 
 
 def build_criterion(vocab_size: int, padding_idx: int, device: str):
@@ -73,39 +74,50 @@ def build_tokenizer(config: Config, vocab=None) -> Tokenizer:
     return tokenizer
 
 
-def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None):
+def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None, dataset_file: str = None):
+    cache = {}
+    if dataset_file:
+        cache = load_dataset(dataset_file, config.device)
+
     dataset = {}
-    src_field, tgt_field, raw_field = get_field(tokenizer=tokenizer,
-                                                fields=fields,
-                                                use_test=True if config.test_src_file else False)
+    src_field, tgt_field, raw_field, feat_fields = get_field(tokenizer=tokenizer,
+                                                             fields=fields,
+                                                             use_test=True if config.test_src_file else False)
+
     logger.info("Building Corpus ...")
     if config.train_src_file:
         logger.info(f"\tReading train dataset ...")
         logger.info(f"\t\tSource file: {config.train_src_file}")
         logger.info(f"\t\tTarget file: {config.train_tgt_file}")
-        fields = (src_field, tgt_field)
+        fields = (src_field, tgt_field, feat_fields)
+        train_cache = cache['train'] if "train" in cache else None
         dataset['train'] = NMTDataset(src_file=config.train_src_file, tgt_file=config.train_tgt_file, fields=fields,
-                                      min_len=config.min_len, max_len=config.max_len,
-                                      device=config.device, is_train=True,
-                                      batch_size=config.batch_size)
+                                      cache=train_cache, tokenizer=tokenizer, min_len=config.min_len, max_len=config.max_len,
+                                      device=config.device, is_train=True, batch_size=config.batch_size)
     if config.dev_src_file:
         logger.info(f"\tReading dev dataset ...")
         logger.info(f"\t\tSource file: {config.dev_src_file}")
         logger.info(f"\t\tTarget file: {config.dev_tgt_file}")
-        fields = (src_field, tgt_field)
+        fields = (src_field, tgt_field, feat_fields)
+        dev_cache = cache['eval'] if "eval" in cache else None
         dataset['eval'] = NMTDataset(src_file=config.dev_src_file, tgt_file=config.dev_tgt_file, fields=fields,
-                                     min_len=config.min_len, max_len=config.max_len,
+                                     cache=dev_cache, tokenizer=tokenizer, min_len=config.min_len, max_len=config.max_len,
                                      device=config.device, is_train=False,
                                      batch_size=config.batch_size)
     if config.test_src_file:
         logger.info(f"\tReading test dataset ...")
         logger.info(f"\t\tSource file: {config.test_src_file}")
         logger.info(f"\t\tTarget file: {config.test_tgt_file}")
-        fields = (src_field, raw_field)
+        fields = (src_field, raw_field, feat_fields)
+        test_cache = cache['test'] if "test" in cache else None
         dataset['test'] = NMTDataset(src_file=config.test_src_file, tgt_file=config.test_tgt_file, fields=fields,
-                                     min_len=config.min_len, max_len=config.max_len,
+                                     cache=test_cache, tokenizer=tokenizer, min_len=config.min_len, max_len=config.max_len,
                                      device=config.device, is_train=False,
                                      batch_size=config.batch_size)
+
+    if config.dataset_file is None:
+        save_dataset(config.save_dir, dataset)
+
     logger.info('\n')
     logger.info(f'{"#"*15}Corpus Summary{"#"*15}')
     logger.info(f'Batch size: {config.batch_size}')
@@ -117,4 +129,6 @@ def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None):
     logger.info(f'Num of test examples: {len(dataset["test"].dataset.examples) if "test" in dataset else 0:,}')
     logger.info(f'{"=" * 40}')
     logger.info('\n')
+
+
     return dataset, fields
