@@ -8,7 +8,8 @@ from tqdm import tqdm
 
 
 class Translator(object):
-    def __init__(self, model, beam_size, max_length, save_dir, metric, device, sos_idx, eos_idx):
+    def __init__(self, config, model, beam_size, max_length, save_dir, metric, device, sos_idx, eos_idx):
+        self.config = config
         self.model = model
         self.beam_size = beam_size
         self.max_lenght = max_length
@@ -38,31 +39,28 @@ class Translator(object):
         predicts = []
         golds = []
         tqdm_bar = tqdm(enumerate(data_iter), total=len(data_iter), desc='TEST')
-        for i, (src, tgts) in tqdm_bar:
-            src, src_length = src
+        for i, batch in tqdm_bar:
+            src, src_length = batch.src
+            feats = [(feat_name, getattr(batch, feat_name)) for feat_name in list(self.config.feat_vocab_sizes.keys())]
             batch_size = src.size(0)
             beam_size = self.beam_size
             bos = [[self.sos_idx]] * (batch_size * beam_size)
-            bos = torch.LongTensor(bos)
+            bos = torch.LongTensor(bos).to(src.device)
             bos = bos.view(-1, 1)
-            if self.cuda:
-                src = src.cuda()
-                src_length = src_length.cuda()
-                bos = bos.cuda()
             with torch.no_grad():
-                context = self.model.encode(src, src_length)
+                context = self.model.encode(src, src_length, feats)
                 context = [context, src_length, None]
                 if beam_size == 1:
                     generator = self.generator.greedy_search
                 else:
                     generator = self.generator.beam_search
                 preds, lengths, counter = generator(batch_size, bos, context)
-            for pred, tgt, raw in list(zip(preds, tgts, src)):
+            for pred, tgt, raw in list(zip(preds, batch.tgt, src)):
                 pred = pred.tolist()
                 detok = tokenizer.detokenize(pred)
                 src_detok = tokenizer.detokenize(raw.long().tolist())
                 predicts.append(detok)
-                golds.append(tgt)
+                golds.append(" ".join(tgt))
                 srcs.append([src_detok])
         return predicts, golds, srcs
 

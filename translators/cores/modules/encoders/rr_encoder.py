@@ -20,8 +20,9 @@ class RREncoder(EncoderBase):
         # Encoder stacked LSTM layer
         self.encoder_layers = nn.ModuleList()
         # Bottom encoder layer is bi-directional
+        total_embedd_size = config.embedd_size + sum([size for _, size in config.feats])
         self.encoder_layers.append(
-            nn.LSTM(config.hidden_size, config.hidden_size, num_layers=1, bias=True,
+            nn.LSTM(total_embedd_size, config.hidden_size, num_layers=1, bias=True,
                     batch_first=True, bidirectional=True))
         # 2nd encoder layer with input_size x2
         self.encoder_layers.append(
@@ -38,10 +39,10 @@ class RREncoder(EncoderBase):
         # Dropout
         self.dropout = nn.Dropout(p=config.dropout)
 
-    def forward(self, src: torch.LongTensor, lengths=None) -> torch.FloatTensor:
+    def forward(self, src: torch.LongTensor, lengths=None, feats=[]) -> torch.FloatTensor:
         #self._check_args(src, lengths)
 
-        emb = self.embedder(src)
+        emb = self.embedder(src, feats)
 
         # Bottom encoder layer (bi-directional)
         emb = self.dropout(emb)

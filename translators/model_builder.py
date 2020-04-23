@@ -6,7 +6,6 @@ from translators.configuration import Config
 from translators.models import NMTModel, GNMT, count_parameters
 from translators.cores.modules.inputters import Tokenizer, NMTDataset, get_field
 from translators.cores.modules.generator import SequenceGenerator
-from translators.cores.functions import save_dataset, load_dataset
 
 
 def build_criterion(vocab_size: int, padding_idx: int, device: str):
@@ -64,24 +63,20 @@ def build_generator(model, beam_size: int, max_seq_len: int, cuda: bool, len_nor
 def build_tokenizer(config: Config, vocab=None) -> Tokenizer:
     if vocab:
         logger.info("Building Tokenizer by pre-train ...")
-        tokenizer = Tokenizer(vocab)
+        tokenizer = Tokenizer(vocab=vocab, features=config.feats)
     else:
         logger.info(f"Building Tokenizer from {config.vocab_file} ...")
-        tokenizer = Tokenizer(config.vocab_file)
+        tokenizer = Tokenizer(vocab=config.vocab_file, features=config.feats)
     config.vocab_size = len(tokenizer)
-
+    for feat_name, vocab in tokenizer.feat_vocabs.items():
+        config.feat_vocab_sizes[feat_name] = {"size": len(vocab), "pad_idx": vocab.stoi["<PAD>"]}
     logger.info('\n')
     return tokenizer
 
 
-def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None, dataset_file: str = None):
-    cache = {}
-    if dataset_file:
-        cache = load_dataset(dataset_file, config.device)
-
+def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None):
     dataset = {}
-    src_field, tgt_field, raw_field, feat_fields = get_field(tokenizer=tokenizer,
-                                                             fields=fields,
+    src_field, tgt_field, raw_field, feat_fields = get_field(tokenizer=tokenizer, fields=fields,
                                                              use_test=True if config.test_src_file else False)
 
     logger.info("Building Corpus ...")
@@ -90,18 +85,16 @@ def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None, dataset_fi
         logger.info(f"\t\tSource file: {config.train_src_file}")
         logger.info(f"\t\tTarget file: {config.train_tgt_file}")
         fields = (src_field, tgt_field, feat_fields)
-        train_cache = cache['train'] if "train" in cache else None
         dataset['train'] = NMTDataset(src_file=config.train_src_file, tgt_file=config.train_tgt_file, fields=fields,
-                                      cache=train_cache, tokenizer=tokenizer, min_len=config.min_len, max_len=config.max_len,
+                                      tokenizer=tokenizer, min_len=config.min_len, max_len=config.max_len,
                                       device=config.device, is_train=True, batch_size=config.batch_size)
     if config.dev_src_file:
         logger.info(f"\tReading dev dataset ...")
         logger.info(f"\t\tSource file: {config.dev_src_file}")
         logger.info(f"\t\tTarget file: {config.dev_tgt_file}")
         fields = (src_field, tgt_field, feat_fields)
-        dev_cache = cache['eval'] if "eval" in cache else None
         dataset['eval'] = NMTDataset(src_file=config.dev_src_file, tgt_file=config.dev_tgt_file, fields=fields,
-                                     cache=dev_cache, tokenizer=tokenizer, min_len=config.min_len, max_len=config.max_len,
+                                     tokenizer=tokenizer, min_len=config.min_len, max_len=config.max_len,
                                      device=config.device, is_train=False,
                                      batch_size=config.batch_size)
     if config.test_src_file:
@@ -109,14 +102,10 @@ def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None, dataset_fi
         logger.info(f"\t\tSource file: {config.test_src_file}")
         logger.info(f"\t\tTarget file: {config.test_tgt_file}")
         fields = (src_field, raw_field, feat_fields)
-        test_cache = cache['test'] if "test" in cache else None
         dataset['test'] = NMTDataset(src_file=config.test_src_file, tgt_file=config.test_tgt_file, fields=fields,
-                                     cache=test_cache, tokenizer=tokenizer, min_len=config.min_len, max_len=config.max_len,
+                                     tokenizer=tokenizer, min_len=config.min_len, max_len=config.max_len,
                                      device=config.device, is_train=False,
                                      batch_size=config.batch_size)
-
-    if config.dataset_file is None:
-        save_dataset(config.save_dir, dataset)
 
     logger.info('\n')
     logger.info(f'{"#"*15}Corpus Summary{"#"*15}')
@@ -131,4 +120,4 @@ def build_dataset(config, tokenizer: Tokenizer, fields: tuple = None, dataset_fi
     logger.info('\n')
 
 
-    return dataset, fields
+    return dataset

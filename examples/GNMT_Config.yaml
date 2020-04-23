@@ -1,16 +1,16 @@
 # DataLoader parameters
-train_src_file: "datasets/bpe_data/train.BPE.10000.en"
-train_tgt_file: "datasets/bpe_data/train.BPE.10000.vi"
+train_src_file: "datasets/feat_data/train.en"
+train_tgt_file: "datasets/feat_data/train.vi"
 
-dev_src_file: "datasets/bpe_data/dev.BPE.10000.en"
-dev_tgt_file: "datasets/bpe_data/dev.BPE.10000.vi"
+dev_src_file: "datasets/feat_data/dev.en"
+dev_tgt_file: "datasets/feat_data/dev.vi"
 
-test_src_file: "datasets/bpe_data/test.BPE.10000.en"
-test_tgt_file: "datasets/bpe_data/test.BPE.10000.vi"
+test_src_file: "datasets/feat_data/test.en"
+test_tgt_file: "datasets/feat_data/test.vi"
 
 vocab_file: "datasets/bpe_data/vocab.bpe.10000"
-#dataset_file: "outputs/nmt_dataset.cache"
-dataset_file: null
+
+feats: [["deprel", 10]]
 # Embeder parameters
 pretrain_vectors: null
 embedd_size: 300
@@ -25,6 +25,8 @@ init_weight: 0.1
 # Trainer parameters
 device: 'cuda'
 batch_size: 16
-epochs: 1000
+train_steps: 200000
+eval_steps: 10000
+save_checkpoint_steps: 5000
 learning_rate: 0.001
 early_stop: 20 # Set value = '0' when not use early stopping and value > 0 when stop training with this value epoch loss not decrease

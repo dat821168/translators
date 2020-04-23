@@ -11,5 +11,5 @@ class EncoderBase(nn.Module):
             assert n_batch == n_batch_, f"Error: Not all encoder arguments have the same value: [{n_batch}, {n_batch_}]"
 
     @classmethod
-    def forward(self, src: torch.LongTensor, lengths=None):
+    def forward(self, src: torch.LongTensor, lengths=None, feats=[]):
         raise NotImplementedError

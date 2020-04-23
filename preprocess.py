@@ -3,7 +3,7 @@ import re
 from tqdm import tqdm
 from multiprocessing import Pool
 
-NLP = stanza.Pipeline(lang='en')
+NLP = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma,depparse')
 def string_detokenize(text, feat):
     text = text.strip()
     detok = ''
@@ -52,6 +52,5 @@ if __name__ == "__main__":
                     if sub_counter:
                         fen.write(f"{sub_counter[0].strip()}\n")
                         fvi.write(f"{sub_counter[1].strip()}\n")
-
             fen.close()
             fvi.close()

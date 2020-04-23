@@ -12,8 +12,8 @@ class GNMT(NMTModel):
 
         self.decoder = RRDecoder(config=config, embedder=embedder)
 
-    def forward(self, src, src_len, tgt):
-        context = self.encode(src, src_len)
+    def forward(self, src, src_len, tgt, feats: list):
+        context = self.encoder(src, src_len, feats)
         context = (context, src_len, None)
-        output, _, _ = self.decode(tgt, context, False)
+        output, _, _ = self.decoder(tgt, context, False)
         return output
