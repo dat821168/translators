@@ -27,10 +27,12 @@ class Config(object):
 
         self.vocab_file: str = None
         self.save_dir: str = "outputs/"
-        self.dataset_file = None
+
         # Embedder
         self.vocab_size: int = None
 
+        self.feats: list = []
+        self.feat_vocab_sizes = {}
         # Special token
         self.PAD_TOKEN = '<pad>'
         self.UNK_TOKEN = '<unk>'

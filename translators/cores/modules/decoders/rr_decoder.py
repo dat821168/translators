@@ -119,7 +119,7 @@ class RRDecoder(DecoderBase):
         enc_context, enc_len, hidden = context
         hidden = self.init_hidden(hidden)
 
-        emb = self.embedder(inputs)
+        emb = self.embedder(inputs, [])
 
         x, h, attn, scores = self.att_rnn(emb, hidden[0], enc_context, enc_len)
         self.append_hidden(h)

@@ -1,5 +1,5 @@
 # DataLoader parameters
-test_src_file: "datasets/bpe_data/test.BPE.10000.en"
+test_src_file: "datasets/feat_data/test.en"
 test_tgt_file: "datasets/raw_data/test.vi"
 
 chkpt_file: "outputs/nmt_model_chkpt.pt"
@@ -7,6 +7,7 @@ chkpt_file: "outputs/nmt_model_chkpt.pt"
 # Embeder parameters
 pretrain_vectors: null
 embedd_size: 300
+feats: [["deprel", 10]]
 
 # Encoder-Decoder parameters
 num_enc_layers: 8

@@ -7,39 +7,70 @@ from translators.logger import logger
 
 
 def plot_figure(save_dir: str, historys: dict):
-    # plot LOSS history
-    plt.plot(historys['AVG_TRAIN_LOSSES'], label='TRAIN')
-    plt.plot(historys['AVG_EVAL_LOSSES'], label='EVAL')
-    plt.xlabel('EPOCH')
+    # plot train LOSS history
+    plt.plot(historys['TRAIN_STEP_LOSSES'], label='TRAIN')
+    plt.xlabel('STEP')
     plt.ylabel('LOSS')
-    plt.title('Model Loss')
+    plt.title('Model Train Loss')
     plt.legend()
-    plt.savefig(os.path.join(save_dir, 'training_loss.png'))
-    logger.info(f'Training loss diagrams was saved in {os.path.join(save_dir, "training_loss.png")} !!!')
-    plt.show()
-    # plot ACC history
-    plt.plot(historys['TRAIN_ACCS'], label='TRAIN')
-    plt.plot(historys['EVAL_ACCS'], label='EVAL')
-    plt.xlabel('EPOCH')
+    plt.savefig(os.path.join(save_dir, 'train_loss.png'))
+    plt.close()
+    logger.info(f'Training loss diagrams was saved in {os.path.join(save_dir, "train_loss.png")} !!!')
+
+    # plot train ACC history
+    plt.plot(historys['TRAIN_STEP_ACCS'], label='TRAIN')
+    plt.xlabel('STEP')
     plt.ylabel('ACC')
-    plt.title('Model ACC')
+    plt.title('Model Train ACC')
     plt.legend()
-    plt.savefig(os.path.join(save_dir, 'training_acc.png'))
-    logger.info(f'Training acc diagrams was saved in {os.path.join(save_dir, "training_acc.png")} !!!')
-    plt.show()
-    # plot PPL history
-    plt.plot(historys['TRAIN_PPLS'], label='TRAIN')
-    plt.plot(historys['EVAL_PPLS'], label='EVAL')
+    plt.savefig(os.path.join(save_dir, 'train_acc.png'))
+    plt.close()
+    logger.info(f'Training acc diagrams was saved in {os.path.join(save_dir, "train_acc.png")} !!!')
+
+    # plot train PPL history
+    plt.plot(historys['TRAIN_STEP_PPLS'], label='TRAIN')
     plt.xlabel('EPOCH')
     plt.ylabel('PPL')
-    plt.title('Model Perplexity')
+    plt.title('Model Train Perplexity')
     plt.legend()
-    plt.savefig(os.path.join(save_dir, 'training_perplexity.png'))
-    logger.info(f'Training ppl diagrams was saved in {os.path.join(save_dir, "training_perplexity.png")} !!!')
-    plt.show()
+    plt.savefig(os.path.join(save_dir, 'train_perplexity.png'))
+    plt.close()
+    logger.info(f'Training ppl diagrams was saved in {os.path.join(save_dir, "train_perplexity.png")} !!!')
+    # ========================================================================================================= #
+
+    # plot eval LOSS history
+    plt.plot(historys['AVG_EVAL_LOSSES'], label='EVAL')
+    plt.xlabel('STEP')
+    plt.ylabel('LOSS')
+    plt.title('Model Eval Loss')
+    plt.legend()
+    plt.savefig(os.path.join(save_dir, 'eval_loss.png'))
+    plt.close()
+    logger.info(f'EVAL loss diagrams was saved in {os.path.join(save_dir, "eval_loss.png")} !!!')
+
+    # plot eval ACC history
+    plt.plot(historys['EVAL_ACCS'], label='EVAL')
+    plt.xlabel('STEP')
+    plt.ylabel('ACC')
+    plt.title('Model Eval ACC')
+    plt.legend()
+    plt.savefig(os.path.join(save_dir, 'eval_acc.png'))
+    plt.close()
+    logger.info(f'EVAL acc diagrams was saved in {os.path.join(save_dir, "eval_acc.png")} !!!')
+
+    # plot eval PPL history
+    plt.plot(historys['EVAL_PPLS'], label='EVAL')
+    plt.xlabel('STEP')
+    plt.ylabel('PPL')
+    plt.title('Model Eval Perplexity')
+    plt.legend()
+    plt.savefig(os.path.join(save_dir, 'eval_perplexity.png'))
+    plt.close()
+    logger.info(f'EVAL ppl diagrams was saved in {os.path.join(save_dir, "eval_perplexity.png")} !!!')
+
 
 def save_train_history(save_dir: str, historys: dict):
-    with open(os.path.join(save_dir, 'training_history.png'), "w", encoding="utf-8") as out:
+    with open(os.path.join(save_dir, 'training_history.json'), "w", encoding="utf-8") as out:
         json.dump(historys, out)
     logger.info(f'Training history was saved in {os.path.join(save_dir, "training_history.png")} !!!')
 

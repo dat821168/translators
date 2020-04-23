@@ -11,8 +11,8 @@ class NMTModel(nn.Module):
         self.encoder = EncoderBase
         self.decoder = DecoderBase
 
-    def encode(self, src: torch.LongTensor, lengths):
-        return self.encoder(src, lengths)
+    def encode(self, src: torch.LongTensor, lengths, feats):
+        return self.encoder(src, lengths, feats)
 
     def decode(self, dec_in: torch.LongTensor, context: tuple,  inference=False):
         return self.decoder(dec_in, context, inference)
