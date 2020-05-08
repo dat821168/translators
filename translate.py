@@ -30,7 +30,8 @@ if __name__ == "__main__":
         try:
             tgt_text, src_tok, feat, tgt_tok, att_scores = translator.translate(src_text)
             if len(src_tok) < 20:
-                make_table(src_text, src_tok[1:-1], feat[1:-1], tgt_text)
+                table_str = make_table(src_text, src_tok[1:-1], feat[1:-1], tgt_text)
+                print(table_str)
             else:
                 sep = "\t|"
                 print("=" * 50)

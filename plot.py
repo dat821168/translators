@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 if __name__ == "__main__":
-    with open("outputs/BLEU 27.51 deprel/training_history.json", 'r', encoding='utf-8') as f, \
+    with open("outputs/GNMT-deprel BLEU 27.51/training_history.json", 'r', encoding='utf-8') as f, \
             open("outputs/BLEU 27.66/training_history.json", 'r', encoding='utf-8') as f2:
         historys = json.load(f2)
         deprel_historys = json.load(f)

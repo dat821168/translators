@@ -13,33 +13,30 @@ def make_table(src_text, src_tok, feat, tgt_text):
     lens = [len(str(tok)) for tok in src_tok]
     lens += [len(str(f)) for f in feat]
     column_widths = max(lens)+1
-    table_width = (column_widths*len(src_tok))+13
-    table_str += '=' * table_width + '\n'
-    print(table_str)
-    src_text_row = f'| SRC text: | {src_text}'.ljust(table_width) + '|\n'
-    table_str += src_text_row
-    print(table_str)
-    tgt_text_row = f'| TGT text: | {tgt_text}'.ljust(table_width) + '|\n'
-    table_str += tgt_text_row
-    print(table_str)
+    # table_width = (column_widths*len(src_tok))+20+len(src_tok)
+    table_width = (column_widths*len(src_tok))+16+len(src_tok)*2
 
-    #
-    # table_str += '|'
-    # for i, item in enumerate(header):
-    #     table_str += ' ' + str(item).ljust(column_widths[i] - 2) + '|'
-    # table_str += '\n'
-    #
-    # table_str += '-' * (sum(column_widths) + 1) + '\n'
-    #
-    # for line in content:
-    #     table_str += '|'
-    #     for i, item in enumerate(line):
-    #         table_str += ' ' + str(item).ljust(column_widths[i] - 2) + '|'
-    #     table_str += '\n'
-    #
-    # table_str += '=' * (sum(column_widths) + 1) + '\n'
-    #
-    # return table_str
+    table_str += '=' * table_width + '\n'
+    # SRC text row
+    src_text_row = f'| SRC text:    | {src_text}'.ljust(table_width-1) + '|\n'
+    table_str += src_text_row
+    # SRC subword row
+    src_subword_row = f'| SRC subword: | '
+    for t in src_tok:
+        src_subword_row += str(t).ljust(column_widths) + '| '
+    src_subword_row = src_subword_row.ljust(table_width) + '\n'
+    table_str += src_subword_row
+    # SRC dep row
+    src_dep_row = f'| SRC feat:    | '
+    for f in feat:
+        src_dep_row += str(f).ljust(column_widths) + '| '
+    src_dep_row = src_dep_row.ljust(table_width) + '\n'
+    table_str += src_dep_row
+    # TGT text row
+    tgt_text_row = f'| TGT text:    | {tgt_text}'.ljust(table_width-1) + '|\n'
+    table_str += tgt_text_row
+    table_str += '=' * table_width + '\n'
+    return table_str
 
 def showAttention(input_sentence, output_words, attentions):
     # Set up figure with colorbar
