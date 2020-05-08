@@ -1,7 +1,7 @@
 import os
 import torch
 
-from torchtext.data import Field, RawField, NestedField, Example, Iterator, Dataset
+from torchtext.data import Field, RawField, Example, Iterator, Dataset
 from translators.cores.modules.inputters import Tokenizer
 from tqdm import tqdm
 

@@ -1,0 +1,19 @@
+# Pre-train
+chkpt_file: "outputs/GNMT-deprel BLEU 27.51/nmt_model_chkpt.pt"
+bpe_codes_file: "outputs/GNMT-deprel BLEU 27.51/bpe_codes.10000"
+# Embeder parameters
+pretrain_vectors: null
+embedd_size: 300
+feats: [["deprel", 10]]
+
+# Encoder-Decoder parameters
+num_enc_layers: 8
+num_dec_layers: 8
+hidden_size: 300
+dropout: 0.2
+init_weight: 0.1
+
+# Translate paremeters
+device: 'cuda'
+beam_size: 4
+max_length: 256

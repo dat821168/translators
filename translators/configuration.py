@@ -28,6 +28,7 @@ class Config(object):
         self.vocab_file: str = None
         self.save_dir: str = "outputs/"
 
+        self.bpe_codes_file: str = None
         # Embedder
         self.vocab_size: int = None
 

@@ -319,7 +319,6 @@ def isolate_glossary(word, glossary):
         return segments + [ending.strip('\r\n ')] if ending != '' else segments
 
 if __name__ == '__main__':
-
     currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
     newdir = os.path.join(currentdir, 'subword_nmt')
     if os.path.isdir(newdir):

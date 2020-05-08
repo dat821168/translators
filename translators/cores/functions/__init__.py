@@ -1,10 +1,8 @@
 import os
-import torch
 import dill
-from translators.logger import logger
 from translators.cores.functions.lr_scheduler import WarmupMultiStepLR
 
-from translators.cores.functions.common import init_lstm_, plot_figure, save_train_history
+from translators.cores.functions.common import init_lstm_, plot_figure, save_train_history, showAttention, make_table
 from translators.cores.functions.mextrics import BLUE
 
 
@@ -30,4 +28,5 @@ def load_dataset(dataset_file: str, device: str = "cuda"):
 _all__ = ['init_lstm_', 'plot_figure', 'save_train_history',
           'WarmupMultiStepLR',
           'BLUE',
+          'showAttention', 'make_table'
           'save_dataset', 'load_dataset']
