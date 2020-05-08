@@ -4,6 +4,7 @@ import torch.nn as nn
 
 from .gnmt import GNMT
 from .nmt import NMTModel
+from .seq2seq import Seq2Seq
 from translators.logger import logger
 
 
@@ -44,7 +45,7 @@ def load_chkpt(chkpt_file: str, optimizer=None, device: str = 'cuda'):
         return step, chkpt['model'], None, vocab
 
 
-__all__ = ['NMTModel', 'GNMT',
+__all__ = ['NMTModel', 'GNMT', 'Seq2Seq'
            'count_parameters', 'save_checkpoint']
 
 

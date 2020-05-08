@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from translators.logger import logger
 from translators.configuration import Config
-from translators.models import NMTModel, GNMT, count_parameters
+from translators.models import NMTModel, GNMT, Seq2Seq, count_parameters
 from translators.cores.modules.inputters import Tokenizer, NMTDataset, get_field
 from translators.cores.modules.generator import SequenceGenerator
 
@@ -21,6 +21,8 @@ def build_model(config: Config) -> NMTModel:
 
     if config.model_type == "GNMT":
         model = GNMT(config)
+    elif config.model_type == "Seq2Seq":
+        model = Seq2Seq(config)
     else:
         model = None
     model = model.to(config.device)

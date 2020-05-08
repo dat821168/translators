@@ -2,7 +2,7 @@ import yaml
 
 import torch
 
-MODEL_TYPES = ['GNMT']
+MODEL_TYPES = ['GNMT', 'Seq2Seq']
 
 
 class Config(object):

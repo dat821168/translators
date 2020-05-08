@@ -26,7 +26,6 @@ class Embedder(nn.Module):
             self.feature_embedding.add_module(feat_name, nn.Embedding(vocab['size'], feat_dim, padding_idx=vocab['pad_idx']).to(config.device))
             nn.init.uniform_(self.feature_embedding[feat_name].weight.data, -config.init_weight, config.init_weight)
 
-
     def load_pretrained_vectors(self, emb_file: str):
         raise NotImplementedError
 

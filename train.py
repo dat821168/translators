@@ -10,7 +10,7 @@ from translators.logger import logger, init_logger
 
 if __name__ == "__main__":
     logger.info('Reading configuation file ...')
-    cnf = Config("examples/GNMT_Config.yaml", "GNMT")
+    cnf = Config("examples/GNMT_Config.yaml", "Seq2Seq")
     init_logger(log_file=os.path.join(cnf.save_dir, "train_nmt_model.log"), log_file_level='INFO')
     # Load tokenizer
     tokenizer = build_tokenizer(cnf)
