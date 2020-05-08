@@ -1,25 +1,15 @@
-import os
-import nltk
-
 from translators import Config
 from translators.models import load_chkpt
-from translators.model_builder import build_model, build_tokenizer, build_dataset
+from translators.model_builder import build_model, build_tokenizer
 from translators.bin import Translator
-from translators.logger import logger, init_logger
-from translators.cores.functions import BLUE
+from translators.cores.functions.common import showAttention, make_table
 
 if __name__ == "__main__":
-    logger.info('Reading configuation file ...')
-    cnf = Config("examples/GNMT_Config_translate.yaml", "GNMT")
-    init_logger(log_file=os.path.join(cnf.save_dir, "train_nmt_model_translate.log"), log_file_level='INFO')
+    cnf = Config("examples/GNMT/GNMT_Config_translate.yaml", "GNMT")
     epoch, model_chkpt, _, vocab = load_chkpt(chkpt_file=cnf.chkpt_file, device=cnf.device)
     tokenizer = build_tokenizer(cnf, vocab)
     nmtmodel = build_model(cnf)
     nmtmodel.load_state_dict(model_chkpt, strict=False)
-    dataset = build_dataset(cnf, tokenizer)
-
-    blue_score = BLUE(ngrams=1)
-    # blue_score = nltk.translate.bleu_score
 
     sos_idx = vocab['tokens'].stoi[tokenizer.sos_token]
     eos_idx = vocab['tokens'].stoi[tokenizer.eos_token]
@@ -28,22 +18,27 @@ if __name__ == "__main__":
                             model=nmtmodel,
                             beam_size=cnf.beam_size,
                             max_length=cnf.max_length,
-                            save_dir=cnf.save_dir,
-                            metric=blue_score,
+                            save_dir=None,
+                            metric=None,
+                            tokenizer=tokenizer,
                             device=cnf.device,
                             sos_idx=sos_idx,
                             eos_idx=eos_idx)
-    test_iter = dataset['test'].iter_dataset()
 
-    best_eval_loss = float('inf')
-    bad_loss_count = 0
-    blue_score = translator.translate(test_iter, tokenizer)
-    try:
-        blue_score = translator.translate(test_iter, tokenizer)
-    except KeyboardInterrupt as e:
-         print(e)
-    except Exception as e:
-         print(e)
-
-
-
+    while True:
+        src_text = input(">>> ")
+        try:
+            tgt_text, src_tok, feat, tgt_tok, att_scores = translator.translate(src_text)
+            if len(src_tok) < 20:
+                make_table(src_text, src_tok[1:-1], feat[1:-1], tgt_text)
+            else:
+                sep = "\t|"
+                print("=" * 50)
+                print(f"src text:    | {src_text}")
+                print(f'src subword: | {sep.join(src_tok[1:-1])}')
+                print(f"src feat:    | {sep.join(feat[1:-1])}")
+                print(f"tgt text:    | {tgt_text}")
+                print("="*50)
+            showAttention(src_tok, tgt_tok, att_scores)
+        except Exception as e:
+            print(e)

@@ -5,9 +5,6 @@ import stanza
 from collections import Counter, OrderedDict
 from torchtext.vocab import Vocab
 
-NLP = stanza.Pipeline(lang="en", processors='tokenize,mwt,pos,lemma,depparse')
-
-
 class Tokenizer(object):
     def __init__(self, vocab: str = None, features: list = [], separator: str = '@@',
                  pad_token: str = '<pad>', unk_token: str = '<unk>',
@@ -34,6 +31,7 @@ class Tokenizer(object):
         return len(self.vocab)
 
     def __get_feats_vocabs(self):
+        NLP = stanza.Pipeline(lang="en", processors='tokenize,mwt,pos,lemma,depparse')
         for feat_name, _ in self.feats:
             if feat_name == 'deprel':
                 counter = Counter(NLP.processors['depparse'].vocab._vocabs['deprel']._id2unit)
@@ -59,10 +57,11 @@ class Tokenizer(object):
             tokens = [t.split(feat_delim)[layer] for t in tokens]
         return tokens
 
-    def detokenize(self, idxs: list, delim: str = ' ') -> str:
+    def detokenize(self, idxs: list, delim: str = ' ', keep_subword=False) -> str:
         detok = delim.join([self.vocab.itos[idx] for idx in idxs])
-        detok = re.sub(self.separator + ' ', '', detok)
-        detok = re.sub(self.separator, '', detok)
+        if not keep_subword:
+            detok = re.sub(self.separator + ' ', '', detok)
+            detok = re.sub(self.separator, '', detok)
 
         detok = re.sub(self.sos_token, '', detok)
         detok = re.sub(self.eos_token, '', detok)

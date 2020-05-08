@@ -160,10 +160,13 @@ class SequenceGenerator:
         # context[1]: (batch * beam)
 
         accu_attn_scores = torch.zeros(batch_size * beam_size, seq)
+        attention_scores = torch.zeros([beam_size, 1, seq])
         if self.cuda:
             accu_attn_scores = accu_attn_scores.cuda()
+            attention_scores = attention_scores.cuda()
 
         counter = 0
+
         for idx in range(1, self.max_seq_len):
             if not len(active):
                 break
@@ -183,6 +186,7 @@ class SequenceGenerator:
             attn = attn.masked_fill(eos_mask.view(-1).unsqueeze(1), 0)
             accu_attn_scores[active] += attn
 
+            attention_scores = torch.cat((attention_scores, attn.unsqueeze(1)), dim=1)
             # words: (batch, beam, k)
             words = words.view(-1, beam_size, beam_size)
             words = words.masked_fill(eos_mask.unsqueeze(2), self.eos_idx)
@@ -262,6 +266,7 @@ class SequenceGenerator:
         _, idx = scores.max(dim=1)
 
         translation = translation[idx + global_offset, :]
+        attention_scores = attention_scores[idx + global_offset, : ]
         lengths = lengths[idx + global_offset]
 
-        return translation, lengths, counter
+        return translation, lengths, counter, attention_scores

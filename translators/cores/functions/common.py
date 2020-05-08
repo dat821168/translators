@@ -2,8 +2,61 @@ import os
 import json
 import torch.nn.init as init
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 from translators.logger import logger
+
+
+def make_table(src_text, src_tok, feat, tgt_text):
+    table_str = ''
+    # dynamically decide column widths
+    lens = [len(str(tok)) for tok in src_tok]
+    lens += [len(str(f)) for f in feat]
+    column_widths = max(lens)+1
+    table_width = (column_widths*len(src_tok))+13
+    table_str += '=' * table_width + '\n'
+    print(table_str)
+    src_text_row = f'| SRC text: | {src_text}'.ljust(table_width) + '|\n'
+    table_str += src_text_row
+    print(table_str)
+    tgt_text_row = f'| TGT text: | {tgt_text}'.ljust(table_width) + '|\n'
+    table_str += tgt_text_row
+    print(table_str)
+
+    #
+    # table_str += '|'
+    # for i, item in enumerate(header):
+    #     table_str += ' ' + str(item).ljust(column_widths[i] - 2) + '|'
+    # table_str += '\n'
+    #
+    # table_str += '-' * (sum(column_widths) + 1) + '\n'
+    #
+    # for line in content:
+    #     table_str += '|'
+    #     for i, item in enumerate(line):
+    #         table_str += ' ' + str(item).ljust(column_widths[i] - 2) + '|'
+    #     table_str += '\n'
+    #
+    # table_str += '=' * (sum(column_widths) + 1) + '\n'
+    #
+    # return table_str
+
+def showAttention(input_sentence, output_words, attentions):
+    # Set up figure with colorbar
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    cax = ax.matshow(attentions.cpu().numpy(), cmap='bone')
+    fig.colorbar(cax)
+
+    # Set up axes
+    ax.set_xticklabels([" "] + input_sentence, rotation=90)
+    ax.set_yticklabels([" "] + output_words.split(" ")+["<eos>"])
+
+    # Show label at every tick
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+
+    plt.show()
 
 
 def plot_figure(save_dir: str, historys: dict):
@@ -101,3 +154,10 @@ def init_lstm_(lstm, init_weight=0.1):
 
         init.uniform_(lstm.bias_ih_l0_reverse.data, -init_weight, init_weight)
         init.zeros_(lstm.bias_hh_l0_reverse.data)
+
+if __name__ == "__main__":
+    src_text = 'I go to school .'
+    src_tok = ['I', 'go', 'to', 'school', '.']
+    tgt_text = 'Tôi đi học .'
+    feat = ['nsubj', 'root', 'case', 'obl', 'punct']
+    make_table(src_text, src_tok, feat, tgt_text)

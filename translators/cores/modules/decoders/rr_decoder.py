@@ -5,6 +5,7 @@ import itertools
 from .decoder import DecoderBase
 from translators.cores.functions.common import init_lstm_
 from translators.cores.modules.attentions import BahdanauAttention
+from translators.cores.modules.generator import Classifier
 
 
 class RecurrentAttention(nn.Module):
@@ -33,31 +34,6 @@ class RecurrentAttention(nn.Module):
         return recurrent_outputs, hidden, attn_outputs, scores
 
 
-class Classifier(nn.Module):
-    """
-    Fully-connected classifier
-    """
-    def __init__(self, in_features, out_features, init_weight=0.1):
-        """
-        Constructor for the Classifier.
-        :param in_features: number of input features
-        :param out_features: number of output features (size of vocabulary)
-        :param init_weight: range for the uniform initializer
-        """
-        super(Classifier, self).__init__()
-        self.classifier = nn.Linear(in_features, out_features)
-        nn.init.uniform_(self.classifier.weight.data, -init_weight, init_weight)
-        nn.init.uniform_(self.classifier.bias.data, -init_weight, init_weight)
-
-    def forward(self, x):
-        """
-        Execute the classifier.
-        :param x: output from decoder
-        """
-        out = self.classifier(x)
-        return out
-
-
 class RRDecoder(DecoderBase):
     def __init__(self, config, embedder):
         super(RRDecoder, self).__init__()
@@ -69,11 +45,10 @@ class RRDecoder(DecoderBase):
         self.embedder = embedder
 
         # Attention layer
-        self.att_rnn = RecurrentAttention(config, config.hidden_size, config.hidden_size, config.hidden_size)
+        self.att_rnn = RecurrentAttention(config, config.embedd_size, config.hidden_size, config.hidden_size)
 
         # Decoder stacked LSTM layer
         self.decoder_layers = nn.ModuleList()
-
         for _ in range(config.num_dec_layers - 1):
             self.decoder_layers.append(
                 nn.LSTM((2*config.hidden_size), config.hidden_size, num_layers=1, bias=True,
